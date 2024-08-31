@@ -1,0 +1,40 @@
+import sys
+from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import Qt
+
+class AlwaysOnTopWindow(QMainWindow):
+    def __init__(self, image_path):
+        super().__init__()
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint | Qt.Tool)
+
+        # QLabel을 사용하여 이미지를 표시
+        label = QLabel(self)
+        pixmap = QPixmap(image_path)
+        label.setPixmap(pixmap)
+
+        # 이미지 크기와 창 크기를 맞춤
+        self.setFixedSize(pixmap.width(), pixmap.height())
+
+        # QLabel의 크기를 설정하여 이미지가 완전히 표시되도록 함
+        label.setFixedSize(pixmap.width(), pixmap.height())
+
+        # 이미지를 창의 왼쪽 아래로 이동
+        label.move(0, self.height() - pixmap.height())
+
+    def mousePressEvent(self, event):
+        # 창을 드래그할 수 있도록 함
+        if event.button() == Qt.LeftButton:
+            self.oldPos = event.globalPos()
+
+    def mouseMoveEvent(self, event):
+        delta = event.globalPos() - self.oldPos
+        self.move(self.x() + delta.x(), self.y() + delta.y())
+        self.oldPos = event.globalPos()
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    image_path = 'meaw.png'  # 이미지 파일 경로를 여기서 사용합니다.
+    window = AlwaysOnTopWindow(image_path)
+    window.show()
+    sys.exit(app.exec_())
